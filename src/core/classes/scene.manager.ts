@@ -1,4 +1,5 @@
 import { Color, HemisphereLight, PerspectiveCamera, Scene } from "three";
+import { Diorama } from "./entities/diorama";
 /**
  * SceneManager class
  * This class is responsible for managing the scene, camera, and lights.
@@ -20,6 +21,9 @@ export class SceneManager {
         SceneManager.createScene();
         SceneManager.createCamera();
         SceneManager.createLights();
+
+        const diorama = new Diorama();
+        diorama.start();
     }
     /**
      * Get the scene
