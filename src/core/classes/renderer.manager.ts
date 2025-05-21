@@ -80,18 +80,37 @@ export class RendererManager {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
+        // this line renders the primary three.js scene (SceneManager.scene) 
+        // from the perspective of the main camera (SceneManager.camera) into an offscreen buffer
         const renderScene = new RenderPass(SceneManager.scene, SceneManager.camera);
+        // specialized post-processing effect that simulates the "bloom" or "glow" 
+        // seen around bright objects in real-world cameras
         const bloomPass = new UnrealBloomPass(new Vector2(width, height), 1.5, 0.4, 0.85);
+        // This line explicitly sets the threshold of the bloom pass to 0. 
+        // This means all pixels in the scene, regardless of their brightness, will contribute to the bloom effect. 
+        // A higher threshold would make the bloom effect only apply to very bright areas.
         bloomPass.threshold = 0;
+        // This controls the intensity of the glow. You can adjust this value to make the bloom more or less pronounced.
         bloomPass.strength = 1;
+        // This controls how far the glow spreads. A radius of 0 might seem counterintuitive for a bloom effect, 
+        // suggesting a very tight or non-existent spread.
         bloomPass.radius = 0;
+        // This is a crucial property. When renderToScreen is set to true for a pass, 
+        // that pass will render its output directly to the canvas 
         bloomPass.renderToScreen = true;
         RendererManager.composer = new EffectComposer(RendererManager.renderer);
         RendererManager.composer.setSize(width, height);
+        // This adds the RenderPass to the composer's chain. 
+        // It's typically the first pass added, as it provides the initial rendered scene
         RendererManager.composer.addPass(renderScene);
+        // This adds the UnrealBloomPass to the composer's chain, after the RenderPass. 
+        // This means the bloom effect will be applied to the output of the RenderPass.
         RendererManager.composer.addPass(bloomPass);
-
-        RendererManager.renderer.toneMappingExposure = Math.pow(0.9, 4.0);
+        // toneMappingExposure is a property of the WebGLRenderer that controls the exposure level 
+        // when tone mapping is applied. Tone mapping is a technique used to map HDR (High Dynamic Range) 
+        // values to LDR (Low Dynamic Range) values, which is necessary for displaying rendered 
+        // scenes on standard monitors.
+        RendererManager.renderer.toneMappingExposure = Math.pow(0.9, 4.0); //Math.pow(0.9, 4.0) calculates 0.9 raised to the power of 4.0, which is 0.6561. Setting toneMappingExposure to a value less than 1.0 will darken the overall scene, which can be useful when combined with bloom to prevent the scene from becoming overexposed due to the added glow.
     };
 
     /**
